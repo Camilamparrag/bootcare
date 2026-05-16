@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Chat con {{ other.username }} — BootcampConnect{% endblock %}
+{% block content %}
+<div class="bg-white rounded shadow">
+    <div class="p-4 border-b">
+        <a href="{% url 'profile' other.username %}" class="font-semibold hover:text-indigo-600">{{ other.username }}</a>
+    </div>
+    <div class="p-4 space-y-3 max-h-96 overflow-y-auto">
+        {% for msg in messages %}
+            <div class="flex {% if msg.sender == request.user %}justify-end{% endif %}">
+                <div class="max-w-xs p-3 rounded {% if msg.sender == request.user %}bg-indigo-600 text-white{% else %}bg-gray-100{% endif %}">
+                    <p>{{ msg.message }}</p>
+                    <small class="{% if msg.sender == request.user %}text-indigo-200{% else %}text-gray-400{% endif %} block text-right">{{ msg.timestamp|date:"H:i" }}</small>
+                </div>
+            </div>
+        {% empty %}
+            <p class="text-gray-500 text-center">Sin mensajes aún. Envía el primero.</p>
+        {% endfor %}
+    </div>
+    <form method="post" action="{% url 'chat:send' other.id %}" class="p-4 border-t flex gap-2">
+        {% csrf_token %}
+        <input type="text" name="message" placeholder="Escribe un mensaje..." class="flex-1 border rounded p-2" required>
+        <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">Enviar</button>
+    </form>
+</div>
+{% endblock %}

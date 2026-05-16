@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Publicación — BootcampConnect{% endblock %}
+{% block content %}
+<div class="bg-white rounded shadow mb-4 p-4">
+    <div class="flex items-center gap-2 mb-3">
+        {% if post.user.avatar %}
+            <img src="{{ post.user.avatar.url }}" alt="" class="w-8 h-8 rounded-full object-cover">
+        {% else %}
+            <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-sm text-indigo-600">{{ post.user.username|first|upper }}</div>
+        {% endif %}
+        <a href="{% url 'profile' post.user.username %}" class="font-semibold hover:text-indigo-600">{{ post.user.username }}</a>
+        <small class="text-gray-500 ml-auto">{{ post.created_at|date:"d M Y H:i" }}</small>
+    </div>
+    {% if post.image %}
+        <img src="{{ post.image.url }}" alt="" class="w-full rounded mb-3">
+    {% endif %}
+    <p class="mb-2">{{ post.caption }}</p>
+    {% if post.hashtags %}
+        <p class="text-indigo-500 text-sm mb-2">{{ post.hashtags }}</p>
+    {% endif %}
+    <div class="flex items-center gap-4 text-sm mb-4">
+        <form method="post" action="{% url 'like-toggle' post.id %}">
+            {% csrf_token %}
+            <button type="submit" class="{% if request.user in post.likes.all %}text-red-500{% else %}text-gray-500{% endif %} hover:text-red-600">
+                ♥ {{ post.likes.count }}
+            </button>
+        </form>
+    </div>
+    <hr>
+    <h3 class="font-semibold mt-3 mb-2">Comentarios</h3>
+    {% for comment in post.comments.all %}
+        <div class="mb-2">
+            <strong>{{ comment.user.username }}</strong>
+            <span class="text-gray-700">{{ comment.text }}</span>
+            <small class="text-gray-400 ml-2">{{ comment.created_at|date:"d M H:i" }}</small>
+        </div>
+    {% empty %}
+        <p class="text-gray-500 text-sm">Sin comentarios.</p>
+    {% endfor %}
+    <form method="post" action="{% url 'add-comment' post.id %}" class="mt-3 flex gap-2">
+        {% csrf_token %}
+        {{ comment_form.text }}
+        <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 shrink-0">Comentar</button>
+    </form>
+</div>
+{% endblock %}

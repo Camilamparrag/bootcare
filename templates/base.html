@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}BootcampConnect{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-900 min-h-screen">
+    <header class="bg-white shadow-sm border-b">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+            <a href="{% url 'feed' %}" class="text-xl font-bold text-indigo-600">BootcampConnect</a>
+            {% if user.is_authenticated %}
+                <nav class="flex items-center gap-4 text-sm">
+                    <a href="{% url 'feed' %}" class="hover:text-indigo-600">Feed</a>
+                    <a href="{% url 'user-search' %}" class="hover:text-indigo-600">Buscar</a>
+                    <a href="{% url 'confessions:list' %}" class="hover:text-indigo-600">Anónimo</a>
+                    <a href="{% url 'chat:inbox' %}" class="hover:text-indigo-600">Chats</a>
+                    <a href="{% url 'profile' user.username %}" class="hover:text-indigo-600">{{ user.username }}</a>
+                    <form method="post" action="{% url 'logout' %}" class="inline">
+                        {% csrf_token %}
+                        <button type="submit" class="text-red-500 hover:text-red-700">Salir</button>
+                    </form>
+                </nav>
+            {% endif %}
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-6">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="mb-4 p-3 rounded {% if message.tags == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

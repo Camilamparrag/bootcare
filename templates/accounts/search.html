@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Buscar Usuarios — BootcampConnect{% endblock %}
+{% block content %}
+<h2 class="text-2xl font-bold mb-4">Buscar Usuarios</h2>
+<form method="get" class="mb-6 flex gap-2">
+    <input type="text" name="q" value="{{ query }}" placeholder="Buscar por username..." class="flex-1 border rounded p-2">
+    <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">Buscar</button>
+</form>
+<div class="space-y-2">
+    {% for u in users %}
+        <div class="bg-white rounded shadow p-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                {% if u.avatar %}
+                    <img src="{{ u.avatar.url }}" alt="" class="w-10 h-10 rounded-full object-cover">
+                {% else %}
+                    <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">{{ u.username|first|upper }}</div>
+                {% endif %}
+                <div>
+                    <a href="{% url 'profile' u.username %}" class="font-semibold hover:text-indigo-600">{{ u.username }}</a>
+                    <p class="text-sm text-gray-500">{{ u.followers.count }} seguidores</p>
+                </div>
+            </div>
+            <form method="post" action="{% url 'follow-toggle' u.id %}">
+                {% csrf_token %}
+                {% if u.id in following_ids %}
+                    <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">Dejar de seguir</button>
+                {% else %}
+                    <button type="submit" class="bg-indigo-600 text-white px-3 py-1 rounded text-sm hover:bg-indigo-700">Seguir</button>
+                {% endif %}
+            </form>
+        </div>
+    {% empty %}
+        <p class="text-gray-500 text-center py-10">No se encontraron usuarios.</p>
+    {% endfor %}
+</div>
+{% endblock %}
